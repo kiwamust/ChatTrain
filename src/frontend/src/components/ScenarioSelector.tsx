@@ -1,5 +1,6 @@
 // Scenario selection screen component
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Scenario } from '../types';
 import { api } from '../services/api';
 import './ScenarioSelector.css';
@@ -9,6 +10,7 @@ interface ScenarioSelectorProps {
 }
 
 export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({ onSelectScenario }) => {
+  const { t } = useTranslation();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +21,7 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({ onSelectScen
         const response = await api.getScenarios();
         setScenarios(response.scenarios);
       } catch (err) {
-        setError('Failed to load scenarios');
+        setError(t('scenarioSelector.error'));
         console.error(err);
       } finally {
         setLoading(false);
@@ -32,7 +34,7 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({ onSelectScen
   if (loading) {
     return (
       <div className="scenario-selector">
-        <div className="loading">Loading scenarios...</div>
+        <div className="loading">{t('scenarioSelector.loading')}</div>
       </div>
     );
   }
@@ -48,8 +50,8 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({ onSelectScen
   return (
     <div className="scenario-selector">
       <div className="header">
-        <h1>ChatTrain - Select Training Scenario</h1>
-        <p>Choose a training scenario to begin your session</p>
+        <h1>{t('scenarioSelector.title')}</h1>
+        <p>{t('scenarioSelector.subtitle')}</p>
       </div>
       
       <div className="scenarios-grid">
@@ -70,7 +72,7 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({ onSelectScen
             <p>{scenario.description}</p>
             <div className="documents-info">
               <span className="document-count">
-                {scenario.documents.length} reference document{scenario.documents.length !== 1 ? 's' : ''}
+                {t('scenarioSelector.documentCount', { count: scenario.documents.length })}
               </span>
             </div>
           </div>

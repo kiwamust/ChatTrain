@@ -1,5 +1,6 @@
 // Message input component for sending messages
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { KeyboardEvent } from 'react';
 import './MessageInput.css';
 
@@ -9,6 +10,7 @@ interface MessageInputProps {
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = false }) => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
@@ -31,17 +33,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disab
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyPress={handleKeyPress}
-        placeholder="Type your response to the customer..."
+        placeholder={t('messageInput.placeholder')}
         disabled={disabled}
-        aria-label="Message input"
+        aria-label={t('messageInput.messageInputLabel')}
         rows={3}
       />
       <button
         onClick={handleSend}
         disabled={disabled || !message.trim()}
-        aria-label="Send message"
+        aria-label={t('messageInput.sendMessageLabel')}
       >
-        Send
+        {t('messageInput.send')}
       </button>
     </div>
   );

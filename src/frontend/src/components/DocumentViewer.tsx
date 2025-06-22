@@ -1,5 +1,6 @@
 // Document viewer component for displaying reference materials
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './DocumentViewer.css';
 
 interface DocumentViewerProps {
@@ -7,6 +8,7 @@ interface DocumentViewerProps {
 }
 
 export const DocumentViewer: React.FC<DocumentViewerProps> = ({ documents }) => {
+  const { t } = useTranslation();
   const [activeDoc, setActiveDoc] = useState(0);
 
   // Mock document content based on filename
@@ -14,118 +16,116 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ documents }) => 
     const mockContents: { [key: string]: React.ReactElement } = {
       'service_guide.pdf': (
         <div className="mock-document">
-          <h2>Customer Service Guide</h2>
-          <h3>1. Greeting Customers</h3>
-          <p>Always begin with a warm, professional greeting:</p>
+          <h2>{t('documentViewer.documents.service_guide.title')}</h2>
+          <h3>{t('documentViewer.documents.service_guide.greeting.title')}</h3>
+          <p>{t('documentViewer.documents.service_guide.greeting.description')}</p>
           <ul>
-            <li>"Good morning/afternoon, thank you for contacting us."</li>
-            <li>"How may I assist you today?"</li>
+            {t('documentViewer.documents.service_guide.greeting.examples', { returnObjects: true }).map((example: string, index: number) => (
+              <li key={index}>"{ example}"</li>
+            ))}
           </ul>
           
-          <h3>2. Active Listening</h3>
-          <p>Key techniques:</p>
+          <h3>{t('documentViewer.documents.service_guide.listening.title')}</h3>
+          <p>{t('documentViewer.documents.service_guide.listening.description')}</p>
           <ul>
-            <li>Let the customer finish speaking</li>
-            <li>Ask clarifying questions</li>
-            <li>Summarize their concerns</li>
+            {t('documentViewer.documents.service_guide.listening.techniques', { returnObjects: true }).map((technique: string, index: number) => (
+              <li key={index}>{technique}</li>
+            ))}
           </ul>
           
-          <h3>3. Problem Resolution</h3>
-          <p>Follow the STAR method:</p>
+          <h3>{t('documentViewer.documents.service_guide.resolution.title')}</h3>
+          <p>{t('documentViewer.documents.service_guide.resolution.description')}</p>
           <ul>
-            <li><strong>S</strong>ituation - Understand the issue</li>
-            <li><strong>T</strong>ask - Identify what needs to be done</li>
-            <li><strong>A</strong>ction - Take appropriate steps</li>
-            <li><strong>R</strong>esult - Ensure customer satisfaction</li>
+            <li><strong>S</strong>ituation - {t('documentViewer.documents.service_guide.resolution.star.situation')}</li>
+            <li><strong>T</strong>ask - {t('documentViewer.documents.service_guide.resolution.star.task')}</li>
+            <li><strong>A</strong>ction - {t('documentViewer.documents.service_guide.resolution.star.action')}</li>
+            <li><strong>R</strong>esult - {t('documentViewer.documents.service_guide.resolution.star.result')}</li>
           </ul>
         </div>
       ),
       'scripts.md': (
         <div className="mock-document">
-          <h2>Common Response Scripts</h2>
-          <h3>Handling Complaints</h3>
-          <p><strong>Template:</strong> "I understand your frustration, and I sincerely apologize for the inconvenience. Let me look into this right away and find a solution for you."</p>
+          <h2>{t('documentViewer.documents.scripts.title')}</h2>
+          <h3>{t('documentViewer.documents.scripts.complaints.title')}</h3>
+          <p><strong>Template:</strong> "{t('documentViewer.documents.scripts.complaints.template')}"</p>
           
-          <h3>Technical Issues</h3>
-          <p><strong>Template:</strong> "I'd be happy to help you resolve this technical issue. Can you please provide me with [specific information needed]?"</p>
+          <h3>{t('documentViewer.documents.scripts.technical.title')}</h3>
+          <p><strong>Template:</strong> "{t('documentViewer.documents.scripts.technical.template')}"</p>
           
-          <h3>Billing Inquiries</h3>
-          <p><strong>Template:</strong> "I'll review your account details to clarify this billing matter. May I have your account number or email address associated with the account?"</p>
+          <h3>{t('documentViewer.documents.scripts.billing.title')}</h3>
+          <p><strong>Template:</strong> "{t('documentViewer.documents.scripts.billing.template')}"</p>
         </div>
       ),
       'tech_manual.pdf': (
         <div className="mock-document">
-          <h2>Technical Support Manual</h2>
-          <h3>Common Issues and Solutions</h3>
-          <h4>Login Problems</h4>
+          <h2>{t('documentViewer.documents.tech_manual.title')}</h2>
+          <h3>{t('documentViewer.documents.tech_manual.commonIssues')}</h3>
+          <h4>{t('documentViewer.documents.tech_manual.login.title')}</h4>
           <ol>
-            <li>Verify username/email is correct</li>
-            <li>Check CAPS LOCK key</li>
-            <li>Reset password if needed</li>
-            <li>Clear browser cache and cookies</li>
+            {t('documentViewer.documents.tech_manual.login.steps', { returnObjects: true }).map((step: string, index: number) => (
+              <li key={index}>{step}</li>
+            ))}
           </ol>
           
-          <h4>Performance Issues</h4>
+          <h4>{t('documentViewer.documents.tech_manual.performance.title')}</h4>
           <ol>
-            <li>Check internet connection speed</li>
-            <li>Update to latest software version</li>
-            <li>Restart device</li>
-            <li>Check system requirements</li>
+            {t('documentViewer.documents.tech_manual.performance.steps', { returnObjects: true }).map((step: string, index: number) => (
+              <li key={index}>{step}</li>
+            ))}
           </ol>
         </div>
       ),
       'troubleshooting.md': (
         <div className="mock-document">
-          <h2>Troubleshooting Guide</h2>
-          <h3>Step-by-Step Procedures</h3>
-          <h4>Error Code Reference</h4>
+          <h2>{t('documentViewer.documents.troubleshooting.title')}</h2>
+          <h3>{t('documentViewer.documents.troubleshooting.procedures')}</h3>
+          <h4>{t('documentViewer.documents.troubleshooting.errorCodes.title')}</h4>
           <ul>
-            <li><strong>Error 401:</strong> Authentication failed - Reset credentials</li>
-            <li><strong>Error 404:</strong> Resource not found - Verify URL/path</li>
-            <li><strong>Error 500:</strong> Server issue - Wait and retry</li>
+            <li><strong>Error 401:</strong> {t('documentViewer.documents.troubleshooting.errorCodes.401')}</li>
+            <li><strong>Error 404:</strong> {t('documentViewer.documents.troubleshooting.errorCodes.404')}</li>
+            <li><strong>Error 500:</strong> {t('documentViewer.documents.troubleshooting.errorCodes.500')}</li>
           </ul>
           
-          <h4>Diagnostic Questions</h4>
+          <h4>{t('documentViewer.documents.troubleshooting.diagnosticQuestions.title')}</h4>
           <ol>
-            <li>When did the issue first occur?</li>
-            <li>What were you trying to do?</li>
-            <li>Have you made any recent changes?</li>
-            <li>Can you reproduce the issue?</li>
+            {t('documentViewer.documents.troubleshooting.diagnosticQuestions.questions', { returnObjects: true }).map((question: string, index: number) => (
+              <li key={index}>{question}</li>
+            ))}
           </ol>
         </div>
       ),
       'sales_guide.pdf': (
         <div className="mock-document">
-          <h2>Sales Training Guide</h2>
-          <h3>Building Rapport</h3>
+          <h2>{t('documentViewer.documents.sales_guide.title')}</h2>
+          <h3>{t('documentViewer.documents.sales_guide.rapport.title')}</h3>
           <ul>
-            <li>Use the customer's name</li>
-            <li>Mirror their communication style</li>
-            <li>Show genuine interest in their needs</li>
+            {t('documentViewer.documents.sales_guide.rapport.techniques', { returnObjects: true }).map((technique: string, index: number) => (
+              <li key={index}>{technique}</li>
+            ))}
           </ul>
           
-          <h3>Identifying Needs</h3>
-          <p>Ask open-ended questions:</p>
+          <h3>{t('documentViewer.documents.sales_guide.needs.title')}</h3>
+          <p>{t('documentViewer.documents.sales_guide.needs.description')}</p>
           <ul>
-            <li>"What challenges are you facing?"</li>
-            <li>"What would an ideal solution look like?"</li>
-            <li>"How would this help your business?"</li>
+            {t('documentViewer.documents.sales_guide.needs.questions', { returnObjects: true }).map((question: string, index: number) => (
+              <li key={index}>"{question}"</li>
+            ))}
           </ul>
         </div>
       ),
       'objection_handling.md': (
         <div className="mock-document">
-          <h2>Handling Sales Objections</h2>
-          <h3>Common Objections & Responses</h3>
+          <h2>{t('documentViewer.documents.objection_handling.title')}</h2>
+          <h3>{t('documentViewer.documents.objection_handling.subtitle')}</h3>
           
-          <h4>"It's too expensive"</h4>
-          <p><strong>Response:</strong> "I understand price is important. Let's look at the value and ROI this brings to your business..."</p>
+          <h4>"{t('documentViewer.documents.objection_handling.expensive.objection')}"</h4>
+          <p><strong>Response:</strong> "{t('documentViewer.documents.objection_handling.expensive.response')}"</p>
           
-          <h4>"I need to think about it"</h4>
-          <p><strong>Response:</strong> "Of course! What specific aspects would you like to consider? I can provide additional information to help with your decision."</p>
+          <h4>"{t('documentViewer.documents.objection_handling.think.objection')}"</h4>
+          <p><strong>Response:</strong> "{t('documentViewer.documents.objection_handling.think.response')}"</p>
           
-          <h4>"We're happy with our current solution"</h4>
-          <p><strong>Response:</strong> "That's great to hear! Many of our customers felt the same way before seeing how we could enhance their current setup..."</p>
+          <h4>"{t('documentViewer.documents.objection_handling.current.objection')}"</h4>
+          <p><strong>Response:</strong> "{t('documentViewer.documents.objection_handling.current.response')}"</p>
         </div>
       )
     };
@@ -133,7 +133,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ documents }) => 
     return mockContents[filename] || (
       <div className="mock-document">
         <h2>{filename}</h2>
-        <p>Mock content for {filename}. This would show the actual document content in the real implementation.</p>
+        <p>{t('documentViewer.mockContent', { filename })}</p>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
       </div>
     );
@@ -142,7 +142,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ documents }) => 
   return (
     <div className="document-viewer">
       <div className="document-tabs">
-        <h3>Reference Documents</h3>
+        <h3>{t('documentViewer.referenceDocuments')}</h3>
         <div className="tabs">
           {documents.map((doc, index) => (
             <button

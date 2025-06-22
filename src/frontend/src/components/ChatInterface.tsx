@@ -1,5 +1,6 @@
 // Main chat interface component with 60/40 split layout
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { DocumentViewer } from './DocumentViewer';
@@ -14,6 +15,7 @@ interface ChatInterfaceProps {
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ scenario, onEndSession }) => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [session, setSession] = useState<{ session_id: string; websocket_url: string } | null>(null);
   const { isConnected, sendMessage, lastMessage, error } = useWebSocket(session?.websocket_url || null);
@@ -29,7 +31,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ scenario, onEndSes
         setMessages([{
           id: 'welcome-' + Date.now(),
           type: 'system_message',
-          content: `Welcome to ${scenario.title}. You are now connected with a customer. Remember to be professional and helpful!`,
+          content: t('chatInterface.welcomeMessage', { scenarioTitle: scenario.title }),
           timestamp: new Date()
         }]);
       } catch (err) {
@@ -77,7 +79,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ scenario, onEndSes
   };
 
   const handleEndSession = () => {
-    if (confirm('Are you sure you want to end this training session?')) {
+    if (confirm(t('chatInterface.endSessionConfirm'))) {
       onEndSession();
     }
   };
@@ -88,11 +90,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ scenario, onEndSes
         <div className="session-info">
           <h2>{scenario.title}</h2>
           <span className="connection-status">
-            {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
+            {isConnected ? `🟢 ${t('chatInterface.connected')}` : `🔴 ${t('chatInterface.disconnected')}`}
           </span>
         </div>
         <button className="end-session-btn" onClick={handleEndSession}>
-          End Session
+          {t('chatInterface.endSession')}
         </button>
       </div>
 
@@ -112,7 +114,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ scenario, onEndSes
 
       {error && (
         <div className="error-notification">
-          Connection error: {error}
+          {t('chatInterface.connectionError')} {error}
         </div>
       )}
     </div>
