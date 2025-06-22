@@ -1,0 +1,316 @@
+name: Claude Code
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+  # 自動レビュー用イベント
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# ──────────────────────────────────────────────
+# 同時実行を 1 本に抑え、前ジョブはキャンセル
+# ──────────────────────────────────────────────
+concurrency:
+  group: claude-${{ github.repository }}
+  cancel-in-progress: true
+
+# ──────────────────────────────────────────────
+# Claude 共通環境変数
+# ──────────────────────────────────────────────
+env:
+  MAX_THINKING_TOKENS: "4096"       # 1 回あたり input を抑える
+  CLAUDE_CODE_AUTO_COMPACT: "true"  # 自動で /compact を挿入
+
+# ====================================================================
+# 1) @claude メンションをトリガにした個別対応ジョブ
+# ====================================================================
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      # --------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Claude[bot]"
+          git config --global user.email "claude-bot@anthropic.com"
+
+      # --------------------------------------------------------------
+      # コメント解析 → action = clone | pr | claude を出力
+      # --------------------------------------------------------------
+      # 既存の Checkout / Configure Git の後
+      - name: Parse Claude Command
+        id: parse
+        shell: bash
+        env:
+          # コメント本文・Issue本文・レビュー本文をどれか 1 つ取得
+          COMMENT_BODY: ${{ github.event.comment.body || github.event.issue.body || github.event.review.body || '' }}
+        run: |
+          set -eo pipefail
+          COMMAND=$(printf '%s\n' "$COMMENT_BODY" \
+                     | grep -oP '(?<=@claude\s).*' \
+                     | head -n1 || true)
+          if [[ -z "$COMMAND" ]]; then
+            # デフォルト：Claude に処理を回す
+            echo "action=claude"   >> "$GITHUB_OUTPUT"
+
+          elif [[ "$COMMAND" =~ ^clone[[:space:]] ]]; then
+            echo "action=clone"    >> "$GITHUB_OUTPUT"
+            # URL は 2 番目のトークンを採用
+            URL=$(printf '%s\n' "$COMMAND" | awk '{print $2}')
+            echo "clone_url=$URL"  >> "$GITHUB_OUTPUT"
+
+          elif [[ "$COMMAND" =~ ^pr[[:space:]] ]]; then
+            echo "action=pr"       >> "$GITHUB_OUTPUT"
+            PR_TITLE=$(printf '%s\n' "$COMMAND" | sed -E 's/^pr[[:space:]]+//')
+            echo "pr_title=$PR_TITLE" >> "$GITHUB_OUTPUT"
+
+          else
+            echo "action=claude"   >> "$GITHUB_OUTPUT"
+          fi
+
+      # --------------------------------------------------------------
+      # clone コマンド
+      # --------------------------------------------------------------
+      - name: Clone External Repository
+        if: steps.parse.outputs.action == 'clone'
+        shell: bash
+        run: |
+          CLONE_URL="${{ steps.parse.outputs.clone_url }}"
+          if [ -z "$CLONE_URL" ]; then
+            echo "::error ::No URL provided for clone command"
+            exit 1
+          fi
+
+          REPO_NAME=$(basename -s .git "$CLONE_URL")
+          git clone "$CLONE_URL" "external-repos/$REPO_NAME"
+
+          BRANCH_NAME="clone-$REPO_NAME-$(date +%s)"
+          git checkout -b "$BRANCH_NAME"
+          git add "external-repos/$REPO_NAME"
+          git commit -m "Clone external repository: $REPO_NAME"
+          git push origin "$BRANCH_NAME"
+
+          gh pr create \
+            --title "Clone: $REPO_NAME" \
+            --body "This PR adds the cloned repository $REPO_NAME from $CLONE_URL" \
+            --base main \
+            --head "$BRANCH_NAME"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # --------------------------------------------------------------
+      # pr コマンド
+      # --------------------------------------------------------------
+      - name: Create Pull Request
+        if: steps.parse.outputs.action == 'pr'
+        shell: bash
+        run: |
+          PR_TITLE="${{ steps.parse.outputs.pr_title }}"
+          [ -z "$PR_TITLE" ] && PR_TITLE="New feature"
+
+          BRANCH_NAME="claude-pr-$(date +%s)"
+          git checkout -b "$BRANCH_NAME"
+
+          CONTEXT="${{ github.event.comment.body || github.event.issue.body }}"
+          echo "dummy file" > claude_dummy_$(date +%s).txt
+          git add .
+          git commit -m "feat: $PR_TITLE"
+          git push origin "$BRANCH_NAME"
+
+          gh pr create \
+            --title "$PR_TITLE" \
+            --body "Created by Claude based on request:\n\n$CONTEXT" \
+            --base main \
+            --head "$BRANCH_NAME"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # --------------------------------------------------------------
+      # 通常の Claude Code
+      # --------------------------------------------------------------
+      - name: Run Claude Code
+        if: steps.parse.outputs.action == 'claude'
+        id: claude
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          trigger_phrase: "@claude"
+        continue-on-error: true       # 失敗時にリトライへ進ませる
+
+      # --------------------------------------------------------------
+      # 429 (rate_limit) が出たら最大 3 回までリトライ
+      # --------------------------------------------------------------
+      - name: Retry on 429
+        if: steps.claude.outcome == 'failure'
+        shell: bash
+        env:
+          RETRY_MAX: 3
+        run: |
+          LOG="$HOME/.claude_code/action_log.json"
+          if [ ! -f "$LOG" ]; then
+            echo "No log file; skip retry."
+            exit 0
+          fi
+
+          if grep -q '"rate_limited"' "$LOG"; then
+            WAIT=$(grep -o '"retry_after_seconds":[0-9]*' "$LOG" | grep -o '[0-9]*' | head -n1)
+            [ -z "$WAIT" ] && WAIT=10
+            for i in $(seq 1 "$RETRY_MAX"); do
+              echo "🕒 Rate-limit retry $i/$RETRY_MAX – wait ${WAIT}s"
+              sleep "$WAIT"
+              gh run retry ${{ github.run_id }} || true
+            done
+          else
+            echo "No rate_limited message; not retrying."
+          fi
+
+# ====================================================================
+# 2) ライトウェイト自動コードレビュー
+# ====================================================================
+  auto-review:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'opened' &&
+      !contains(github.event.pull_request.title, '[skip-review]') &&
+      !contains(github.event.pull_request.title, 'WIP') &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ────────────────────── PR サイズ計測 ──────────────────────
+      - name: Check PR Size Limits
+        id: size-check
+        shell: bash
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD~1 | wc -l)
+          echo "changed_files=$CHANGED_FILES" >> "$GITHUB_OUTPUT"
+
+          if [ "$CHANGED_FILES" -gt 15 ]; then
+            echo "skip_review=true"  >> "$GITHUB_OUTPUT"
+            echo "reason=ファイル数が多すぎます ($CHANGED_FILES ファイル)" >> "$GITHUB_OUTPUT"
+          else
+            CHANGED_LINES=$(git diff --shortstat HEAD~1 | grep -o '[0-9]* insertion' | cut -d' ' -f1 || echo 0)
+            if [ "$CHANGED_LINES" -gt 500 ]; then
+              echo "skip_review=true"  >> "$GITHUB_OUTPUT"
+              echo "reason=変更行数が多すぎます ($CHANGED_LINES 行)" >> "$GITHUB_OUTPUT"
+            else
+              echo "skip_review=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      # ────────────────────── サイズ超過時の通知 ──────────────────────
+      - name: Post Size Limit Message
+        if: steps.size-check.outputs.skip_review == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `⚠️ **自動レビューをスキップしました**\n\n理由: ${{ steps.size-check.outputs.reason }}\n\n大きな変更のため、手動でのレビューを推奨します。\n必要な場合は \`@claude このPRをレビューして\` とメンションしてください。`
+            });
+
+      # ────────────────────── Claude による簡易レビュー ──────────────────────
+      - name: Run Lightweight Code Review
+        if: steps.size-check.outputs.skip_review == 'false'
+        id: auto-review
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            このPRの変更を簡潔にレビューしてください（最重要点のみ）：
+
+            **チェック項目：**
+            1. 🐛 **バグ・エラー** - 明らかなバグやエラーハンドリングの問題  
+            2. 🔒 **セキュリティ** - 脆弱性や機密情報漏洩リスク  
+            3. ⚡ **重大なパフォーマンス問題** - 明らかに非効率な実装  
+
+            **出力形式：**
+            ## 🤖 簡易自動レビュー
+
+            ### 🔴 修正必須項目
+            [問題がある場合のみ記載]
+
+            ### ✅ 確認完了
+            - 基本的なバグチェック: OK
+            - セキュリティチェック: OK
+            - パフォーマンスチェック: OK
+
+            **総合:** [問題なし/要確認]
+
+            詳細レビューが必要な場合は `@claude 詳細レビュー` でリクエストしてください。
+          allowed_tools: |
+            Bash(git diff --name-only HEAD~1),
+            Bash(git diff HEAD~1 --stat),
+            View
+          timeout_minutes: 3
+
+      # ────────────────────── レビュー結果をコメント ──────────────────────
+      - name: Post Review Comment
+        if: steps.auto-review.conclusion == 'success' && steps.size-check.outputs.skip_review == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const execFile = process.env.EXEC_FILE;
+            let content = '';
+
+            try {
+              if (execFile && fs.existsSync(execFile)) {
+                const log = JSON.parse(fs.readFileSync(execFile, 'utf8'));
+                for (let i = log.length - 1; i >= 0; i--) {
+                  if (log[i].role === 'assistant' && log[i].content) {
+                    content = log[i].content;
+                    break;
+                  }
+                }
+              }
+            } catch (e) {
+              console.error('Failed to read execution file:', e);
+            }
+
+            if (content) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `${content}\n\n---\n**🤖 簡易自動レビュー完了** | 詳細レビュー: \`@claude 詳細レビュー\` | カスタム質問: \`@claude [質問内容]\``
+              });
+            }
+        env:
+          EXEC_FILE: ${{ steps.auto-review.outputs.execution_file }}
