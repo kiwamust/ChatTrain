@@ -102,7 +102,7 @@ check_service_health() {
     
     # Check backend health
     log "Checking backend health..."
-    if curl -f "$BACKEND_URL/health" > /dev/null 2>&1; then
+    if curl -f "$BACKEND_URL/api/health" > /dev/null 2>&1; then
         success "✅ Backend health check passed"
     else
         error "❌ Backend health check failed"

@@ -1,6 +1,6 @@
 // WebSocket hook for real-time communication
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { WebSocketMessage } from '../types';
+import type { WebSocketMessage } from '../types';
 import { MockWebSocket } from '../services/api';
 
 interface UseWebSocketReturn {

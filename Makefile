@@ -18,6 +18,7 @@ COMPOSE_FILE := docker-compose.yml
 COMPOSE_PROD_FILE := docker-compose.prod.yml
 BACKEND_DIR := src/backend
 FRONTEND_DIR := src/frontend
+PYTHON_CMD := python3.11
 
 help: ## Show this help message
 	@echo "$(CYAN)ChatTrain MVP1 - Available Commands$(RESET)"
@@ -52,16 +53,16 @@ dev-build: ## Build and start development environment
 test: ## Run all tests
 	@echo "$(CYAN)Running ChatTrain tests...$(RESET)"
 	@echo "Running backend tests..."
-	@cd $(BACKEND_DIR) && python -m pytest tests/ -v
+	@cd $(BACKEND_DIR) && source venv/bin/activate && $(PYTHON_CMD) -m pytest ../../tests/ -v
 	@echo "Running frontend tests..."
 	@cd $(FRONTEND_DIR) && npm test
 	@echo "Running integration tests..."
-	@python scripts/integration_test_enhanced.py
+	@$(PYTHON_CMD) scripts/integration_test_enhanced.py
 	@echo "$(GREEN)✅ All tests completed!$(RESET)"
 
 test-backend: ## Run backend tests only
 	@echo "$(CYAN)Running backend tests...$(RESET)"
-	@cd $(BACKEND_DIR) && python -m pytest tests/ -v
+	@cd $(BACKEND_DIR) && source venv/bin/activate && $(PYTHON_CMD) -m pytest ../../tests/ -v
 
 test-frontend: ## Run frontend tests only
 	@echo "$(CYAN)Running frontend tests...$(RESET)"
@@ -69,11 +70,11 @@ test-frontend: ## Run frontend tests only
 
 test-integration: ## Run integration tests
 	@echo "$(CYAN)Running integration tests...$(RESET)"
-	@python scripts/integration_test_enhanced.py
+	@$(PYTHON_CMD) scripts/integration_test_enhanced.py
 
 test-load: ## Run load tests
 	@echo "$(CYAN)Running load tests...$(RESET)"
-	@python scripts/load_test.py
+	@$(PYTHON_CMD) scripts/load_test.py
 
 ## Production
 build: ## Build production Docker images
@@ -212,7 +213,7 @@ quick-deploy: build deploy ## Quick deploy: build and deploy to production
 
 quick-test: ## Quick test: run essential tests
 	@echo "$(CYAN)Running quick tests...$(RESET)"
-	@python scripts/integration_test.py
+	@$(PYTHON_CMD) scripts/integration_test.py
 	@./scripts/health_check.sh
 	@echo "$(GREEN)✅ Quick tests completed$(RESET)"
 

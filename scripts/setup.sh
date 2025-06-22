@@ -73,10 +73,22 @@ check_requirements() {
         exit 1
     fi
     
-    # Check Python version
-    PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-    if ! python3 -c "import sys; exit(0 if sys.version_info >= (3, 11) else 1)"; then
-        error "Python 3.11+ is required. Current version: $PYTHON_VERSION"
+    # Check Python version - prefer Python 3.11
+    if command -v python3.11 &> /dev/null; then
+        PYTHON_CMD="python3.11"
+        PYTHON_VERSION=$(python3.11 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        success "Found Python 3.11: $PYTHON_VERSION"
+    elif command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+        PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        if ! python3 -c "import sys; exit(0 if sys.version_info >= (3, 11) else 1)"; then
+            error "Python 3.11+ is required. Current version: $PYTHON_VERSION"
+            error "Please install Python 3.11: brew install python@3.11"
+            exit 1
+        fi
+        success "Found Python 3: $PYTHON_VERSION"
+    else
+        error "Python 3.11+ is not installed. Please install Python 3.11+ from https://python.org/"
         exit 1
     fi
     
@@ -116,7 +128,7 @@ setup_backend() {
     # Create virtual environment if it doesn't exist
     if [ ! -d "venv" ]; then
         log "Creating Python virtual environment..."
-        python3 -m venv venv
+        $PYTHON_CMD -m venv venv
     fi
     
     # Activate virtual environment and install dependencies

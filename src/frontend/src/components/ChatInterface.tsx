@@ -4,7 +4,7 @@ import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { DocumentViewer } from './DocumentViewer';
 import { useWebSocket } from '../hooks/useWebSocket';
-import { Scenario, Message, WebSocketMessage } from '../types';
+import type { Scenario, Message, WebSocketMessage } from '../types';
 import { api } from '../services/api';
 import './ChatInterface.css';
 

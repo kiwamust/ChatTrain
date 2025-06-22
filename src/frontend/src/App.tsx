@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+import { useState } from 'react';
 import { ScenarioSelector } from './components/ScenarioSelector';
 import { ChatInterface } from './components/ChatInterface';
-import { Scenario } from './types';
+import type { Scenario } from './types';
 import './App.css';
 
 function App() {

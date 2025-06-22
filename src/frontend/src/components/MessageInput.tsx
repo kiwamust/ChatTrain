@@ -1,5 +1,6 @@
 // Message input component for sending messages
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import './MessageInput.css';
 
 interface MessageInputProps {

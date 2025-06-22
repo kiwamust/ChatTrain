@@ -1,5 +1,5 @@
 // API client with mock services for development
-import { Scenario, Session } from '../types';
+import type { Scenario, Session } from '../types';
 
 // Mock API for development
 export const mockAPI = {
@@ -27,7 +27,7 @@ export const mockAPI = {
       ]
     }),
     
-  createSession: (scenarioId: string, userId: string): Promise<Session> => 
+  createSession: (_scenarioId: string, _userId: string): Promise<Session> => 
     Promise.resolve({ 
       session_id: `mock-session-${Date.now()}`,
       websocket_url: `ws://localhost:8000/chat/mock-session-${Date.now()}`

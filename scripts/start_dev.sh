@@ -75,7 +75,7 @@ start_services() {
     RETRY_COUNT=0
     
     while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-        if curl -f http://localhost:8000/health > /dev/null 2>&1; then
+        if curl -f http://localhost:8000/api/health > /dev/null 2>&1; then
             success "Backend service is ready"
             break
         fi
@@ -144,7 +144,7 @@ health_check() {
     log "Running health checks..."
     
     # Check backend health
-    if curl -f http://localhost:8000/health > /dev/null 2>&1; then
+    if curl -f http://localhost:8000/api/health > /dev/null 2>&1; then
         success "✅ Backend: Healthy"
     else
         error "❌ Backend: Unhealthy"

@@ -11,7 +11,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ documents }) => 
 
   // Mock document content based on filename
   const getDocumentContent = (filename: string) => {
-    const mockContents: { [key: string]: JSX.Element } = {
+    const mockContents: { [key: string]: React.ReactElement } = {
       'service_guide.pdf': (
         <div className="mock-document">
           <h2>Customer Service Guide</h2>

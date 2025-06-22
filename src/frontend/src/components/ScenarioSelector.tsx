@@ -1,6 +1,6 @@
 // Scenario selection screen component
 import React, { useEffect, useState } from 'react';
-import { Scenario } from '../types';
+import type { Scenario } from '../types';
 import { api } from '../services/api';
 import './ScenarioSelector.css';
 
