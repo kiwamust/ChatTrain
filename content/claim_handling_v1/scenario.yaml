@@ -1,0 +1,35 @@
+id: "claim_handling_v1"
+title: "Insurance Claim Handling Training"
+description: "Learn to handle customer insurance claims with empathy and efficiency. Practice gathering information, providing support, and guiding customers through the claims process."
+duration_minutes: 30
+
+bot_messages:
+  - content: "Hi there, I was in a car accident yesterday and I really need to file a claim. I'm pretty shaken up and not sure what to do. Can you help me please?"
+    expected_keywords: ["sorry", "help", "assist", "understand", "policy", "information"]
+    
+  - content: "Thank you so much. My policy number is AC-789456. The accident happened around 3:30 PM yesterday on Highway 101 near the Mill Valley exit. I was stopped at a red light when someone rear-ended me."
+    expected_keywords: ["details", "information", "when", "where", "other driver", "police", "injuries"]
+    
+  - content: "Yes, there was another car involved - a blue Honda Civic. The driver seemed okay but was very apologetic. I have some neck pain and a headache, but I haven't been to a doctor yet. Should I get checked out?"
+    expected_keywords: ["medical", "doctor", "injuries", "report", "claim number", "next steps"]
+    
+  - content: "The police did come to the scene and they filed a report. I have the report number if you need it - it's #RPT-2024-0156. I also took some photos of both cars and the intersection."
+    expected_keywords: ["documentation", "photos", "claim number", "adjuster", "next steps", "contact"]
+    
+  - content: "That sounds good. When should I expect to hear from the adjuster? And what about getting my car repaired? It's my only vehicle and I need it for work. This whole situation is really stressing me out."
+    expected_keywords: ["timeline", "repair", "rental", "adjuster", "reassure", "follow up"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.7
+  max_tokens: 200
+
+documents:
+  - filename: "claim_guide.pdf"
+    title: "Insurance Claim Processing Guide"
+  - filename: "empathy_examples.md"
+    title: "Customer Empathy & Communication Examples"
+
+completion:
+  min_exchanges: 5
+  required_keywords: ["policy", "details", "medical", "next steps", "claim number"]

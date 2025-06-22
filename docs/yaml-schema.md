@@ -1,394 +1,319 @@
-# ChatTrain Scenario YAML Schema
+# ChatTrain MVP1 Scenario YAML Schema (Simplified)
 
 ## Overview
 
-This document defines the YAML schema for ChatTrain training scenarios. Scenarios are defined using a structured YAML format that specifies learning objectives, LLM behavior, conversation flow, evaluation criteria, and supporting materials.
+This document defines a **minimal YAML schema** for ChatTrain MVP1 training scenarios. The schema is designed for simplicity and rapid content creation, supporting 5 pilot users with 2 basic scenarios.
 
-## Schema Definition
+## Simplified Schema Definition
 
-### Root Schema
+### Core Structure
 
 ```yaml
-# Required: Unique identifier for the scenario
+# Required: Unique identifier
 id: string
 
-# Required: Semantic version (SemVer format)
-version: string
-
-# Required: Human-readable title
+# Required: Human-readable title  
 title: string
 
-# Optional: Detailed description
+# Optional: Brief description
 description?: string
 
-# Required: Domain classification
-domain: string
+# Required: Expected session duration
+duration_minutes: number
 
-# Optional: Difficulty level
-difficulty?: "beginner" | "intermediate" | "advanced"
+# Required: Bot conversation messages
+bot_messages:
+  - content: string           # What the bot says
+    expected_keywords: [string] # Keywords to check in user response
 
-# Optional: Expected duration in minutes
-duration_minutes?: number
+# Required: LLM configuration  
+llm_config:
+  model: string              # OpenAI model name
+  temperature: number        # 0.0 - 1.0
+  max_tokens: number         # Response length limit
 
-# Optional: Tags for categorization
-tags?: string[]
+# Optional: Reference documents
+documents?: 
+  - filename: string         # File in scenario directory
+    title?: string           # Display name
 
-# Required: SMART learning goals (at least 1)
-smart_goals:
-  - S: string  # Specific
-    M: string  # Measurable  
-    A: string  # Achievable
-    R: string  # Relevant
-    T: string  # Time-bound
-
-# Required: LLM configuration
-llm_profile:
-  model: string
-  temperature: number  # 0.0 - 1.0
-  max_tokens?: number
-  system_prompt: string
-  persona?: PersonaConfig
-
-# Required: Conversation steps
-steps: Step[]
-
-# Optional: Session completion conditions
-completion_conditions?: CompletionConfig
-
-# Optional: A/B testing variants
-variant?: "A" | "B"
-
-# Optional: Supporting documents
-attachments?: AttachmentConfig[]
-
-# Optional: Metadata
-metadata?: object
-```
-
-### PersonaConfig
-
-```yaml
-# LLM persona configuration
-persona:
-  # Required: Character name
-  name: string
-  
-  # Optional: Background information
-  background?: string
-  
-  # Optional: Emotional state
-  emotional_state?: string
-  
-  # Optional: Knowledge level about the topic
-  knowledge_level?: "novice" | "intermediate" | "expert"
-  
-  # Optional: Communication style
-  communication_style?: string
-  
-  # Optional: Specific traits or characteristics
-  traits?: string[]
-  
-  # Optional: Goals or motivations
-  goals?: string[]
-```
-
-### Step
-
-```yaml
-# Required: Unique step identifier
-id: string
-
-# Required: Message sender role
-role: "bot" | "user" | "system" | "feedback"
-
-# Required for bot/system roles: Message content
-message?: string
-
-# Optional: Expected user actions (for user role steps)
-expected_user_actions?: string[]
-
-# Optional: Evaluation criteria
-rubric?: RubricConfig
-
-# Optional: Conditional logic
-conditions?: ConditionConfig[]
-
-# Optional: Attachments specific to this step
-attachments?: AttachmentConfig[]
-
-# Optional: Step metadata
-metadata?: object
-```
-
-### RubricConfig
-
-```yaml
-# Evaluation rubric for user responses
-rubric:
-  # Required criteria that must be present
-  must_include?: string[]
-  
-  # Preferred criteria (nice to have)
-  nice_to_have?: string[]
-  
-  # Criteria that should be avoided
-  should_avoid?: string[]
-  
-  # Minimum required score (0-100)
-  minimum_score?: number
-  
-  # Custom evaluation prompts for GPT Judge
-  custom_evaluation?: string
-  
-  # Weight for this step in overall scoring
-  weight?: number
-```
-
-### ConditionConfig
-
-```yaml
-# Conditional logic for dynamic scenarios
-conditions:
-  # Condition type
-  - type: "user_response_contains" | "step_score_above" | "session_time_elapsed"
-    
-    # Condition parameters
-    params:
-      # For user_response_contains
-      keywords?: string[]
-      
-      # For step_score_above  
-      threshold?: number
-      
-      # For session_time_elapsed
-      minutes?: number
-    
-    # Action to take if condition is met
-    action:
-      type: "jump_to_step" | "end_session" | "show_hint"
-      target?: string  # Step ID or message
-```
-
-### CompletionConfig
-
-```yaml
-# Session completion conditions
-completion_conditions:
-  # Completion type
-  type: "all_steps_completed" | "minimum_score_reached" | "time_limit" | "user_chooses_exit"
-  
-  # Minimum overall score required (0-100)
-  minimum_score?: number
-  
-  # Maximum session duration in minutes
-  time_limit_minutes?: number
-  
-  # Allow early completion if conditions are met
-  allow_early_completion?: boolean
-```
-
-### AttachmentConfig
-
-```yaml
-# Supporting documents and materials
-attachments:
-  - # Required: Filename
-    filename: string
-    
-    # Required: File type
-    type: "pdf" | "markdown" | "image" | "url"
-    
-    # Optional: Display title
-    title?: string
-    
-    # Optional: Description
-    description?: string
-    
-    # Required for URL type: External URL
-    url?: string
-    
-    # Optional: When to show this attachment
-    show_condition?: "always" | "on_step" | "on_demand"
-    
-    # Optional: Specific step ID when to show
-    show_on_step?: string
+# Optional: Simple completion criteria
+completion:
+  min_exchanges?: number     # Minimum conversation exchanges
+  required_keywords?: [string] # Must be mentioned by user
 ```
 
 ## Complete Example
 
 ```yaml
-id: "onboarding.claim_handling.v1"
-version: "1.0.0"
+id: "claim_handling_v1"
 title: "Insurance Claim Handling Basics"
 description: "Learn to handle customer insurance claims with empathy and efficiency"
-domain: "onboarding"
-difficulty: "beginner"
 duration_minutes: 30
-tags: ["insurance", "customer-service", "claims"]
 
-smart_goals:
-  - S: "Handle an insurance claim inquiry from start to information gathering"
-    M: "Successfully collect policy number, incident details, and contact information"
-    A: "Using company guidelines and communication best practices"
-    R: "To ensure customer satisfaction and accurate claim processing"
-    T: "Within a 30-minute training session"
+# Simple conversation flow
+bot_messages:
+  - content: "Hi, I was in a car accident yesterday and need to file a claim. Can you help me?"
+    expected_keywords: ["policy", "help", "assist", "sorry"]
+    
+  - content: "Yes, my policy number is AC-123456. The accident happened around 3 PM on Highway 101."
+    expected_keywords: ["details", "information", "when", "where", "incident"]
+    
+  - content: "There was another car involved - they rear-ended me at a red light. I have some neck pain but nothing severe."
+    expected_keywords: ["medical", "doctor", "injury", "report", "police"]
+    
+  - content: "The police came and filed a report. I have the report number if you need it."
+    expected_keywords: ["next", "steps", "documentation", "claim number"]
 
-llm_profile:
-  model: "gpt-4o"
-  temperature: 0.7
-  max_tokens: 200
-  system_prompt: |
-    You are Sarah Johnson, a customer who was recently in a car accident and needs to file an insurance claim.
-    You are somewhat anxious about the process but cooperative. You have your policy information available.
-    Respond naturally as if you're really in this situation.
-  persona:
-    name: "Sarah Johnson"
-    background: "Office worker who was in a minor car accident yesterday"
-    emotional_state: "anxious but hopeful"
-    knowledge_level: "novice"
-    communication_style: "direct but polite"
-    traits: ["detail-oriented", "slightly worried", "wants clear guidance"]
-    goals: ["get claim processed quickly", "understand next steps", "avoid complications"]
+# LLM behavior configuration
+llm_config:
+  model: "gpt-4o-mini"  # Cost-effective model for MVP
+  temperature: 0.7      # Balanced creativity
+  max_tokens: 200       # Keep responses concise
 
-steps:
-  - id: "step_1_greeting"
-    role: "bot"
-    message: "Hi, I was in a car accident yesterday and I need to file a claim. Can you help me with that?"
-    rubric:
-      must_include: ["empathy", "willingness_to_help", "next_steps"]
-      nice_to_have: ["personal_greeting", "reassurance"]
-      minimum_score: 70
-      weight: 15
-
-  - id: "step_2_policy_info"
-    role: "user"
-    expected_user_actions: ["ask_for_policy_number", "gather_basic_info"]
-    rubric:
-      must_include: ["policy_number_request", "incident_date_question"]
-      nice_to_have: ["verification_method", "data_security_mention"]
-      minimum_score: 80
-      weight: 25
-
-  - id: "step_3_policy_response"
-    role: "bot"
-    message: "Yes, my policy number is AC-789456. The accident happened yesterday around 3 PM."
-    rubric:
-      must_include: ["confirmation_of_info", "additional_questions"]
-      nice_to_have: ["documentation_explanation", "timeline_setting"]
-      minimum_score: 75
-      weight: 20
-
-  - id: "step_4_incident_details"
-    role: "user"
-    expected_user_actions: ["gather_incident_details", "ask_about_injuries", "location_details"]
-    rubric:
-      must_include: ["location_question", "other_parties_involved", "police_report"]
-      nice_to_have: ["injury_concern", "property_damage_assessment"]
-      should_avoid: ["rushed_questioning", "insensitive_language"]
-      minimum_score: 85
-      weight: 30
-
-  - id: "step_5_details_response"
-    role: "bot"
-    message: "It happened on Highway 101 near the Main Street exit. There was another car involved - they rear-ended me at a red light. The police came and filed a report. I have some neck pain but nothing severe."
-    conditions:
-      - type: "user_response_contains"
-        params:
-          keywords: ["doctor", "medical", "injury"]
-        action:
-          type: "show_hint"
-          target: "Great job showing concern for medical issues!"
-
-  - id: "step_6_next_steps"
-    role: "user"
-    expected_user_actions: ["provide_next_steps", "set_expectations", "contact_information"]
-    rubric:
-      must_include: ["clear_next_steps", "timeline", "contact_method"]
-      nice_to_have: ["documentation_needed", "claim_number_mention", "follow_up_schedule"]
-      minimum_score: 80
-      weight: 10
-
-completion_conditions:
-  type: "all_steps_completed"
-  minimum_score: 75
-  allow_early_completion: false
-
-attachments:
+# Supporting documents
+documents:
   - filename: "claim_handling_guide.pdf"
-    type: "pdf"
     title: "Claim Handling Procedures"
-    description: "Official company guidelines for processing insurance claims"
-    show_condition: "always"
-    
-  - filename: "empathy_phrases.md"
-    type: "markdown"
-    title: "Empathetic Communication Examples"
-    description: "Sample phrases for showing empathy to customers"
-    show_condition: "on_demand"
-    
-  - filename: "claim_form_example.pdf"
-    type: "pdf"
-    title: "Sample Claim Form"
-    description: "Example of completed claim documentation"
-    show_condition: "on_step"
-    show_on_step: "step_6_next_steps"
+  - filename: "empathy_examples.md"
+    title: "Customer Empathy Examples"
 
-variant: "A"
-
-metadata:
-  created_by: "T.Trainer"
-  created_date: "2025-06-15"
-  last_modified: "2025-06-20"
-  review_status: "approved"
-  target_audience: "new_customer_service_reps"
+# Simple completion criteria
+completion:
+  min_exchanges: 4           # At least 4 back-and-forth exchanges
+  required_keywords: ["policy", "details", "next steps"]  # Must cover these topics
 ```
 
-## Validation Rules
+## Second Example Scenario
+
+```yaml
+id: "customer_service_v1"
+title: "Customer Service Basics"
+description: "Handle general customer inquiries with professionalism"
+duration_minutes: 30
+
+bot_messages:
+  - content: "Hello, I'm having trouble with my account. I can't log in to the website."
+    expected_keywords: ["help", "assistance", "sorry", "troubleshoot"]
+    
+  - content: "I've been trying for the past hour. My username is john.smith and I keep getting an error message."
+    expected_keywords: ["reset", "password", "verify", "email"]
+    
+  - content: "I think I might have changed my password recently but I can't remember what I changed it to."
+    expected_keywords: ["reset", "email", "link", "temporary"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 150
+
+documents:
+  - filename: "customer_service_manual.pdf"
+    title: "Customer Service Guidelines"
+  - filename: "troubleshooting_steps.md"  
+    title: "Common Issue Solutions"
+
+completion:
+  min_exchanges: 3
+  required_keywords: ["password", "reset", "help"]
+```
+
+## Schema Validation Rules
 
 ### Required Fields
-- `id`: Must be unique across all scenarios
-- `version`: Must follow SemVer format (e.g., "1.0.0")
-- `title`: Must be 5-100 characters
-- `domain`: Must be alphanumeric with underscores
-- `smart_goals`: Must have at least one complete SMART goal
-- `llm_profile`: Must include model, temperature, and system_prompt
-- `steps`: Must have at least one step
+- `id`: Must be unique, alphanumeric with underscores
+- `title`: 5-100 characters
+- `duration_minutes`: Positive integer (typically 30)
+- `bot_messages`: At least 1 message
+- `llm_config`: Must include model, temperature, max_tokens
 
-### Data Type Validation
-- `temperature`: Must be between 0.0 and 1.0
-- `duration_minutes`: Must be positive integer
-- `minimum_score`: Must be between 0 and 100
-- `weight`: Must be positive number
-- `version`: Must match semantic versioning pattern
+### Data Types
+- `temperature`: Float between 0.0 and 1.0
+- `max_tokens`: Integer between 50 and 500
+- `min_exchanges`: Positive integer
+- `expected_keywords`: Array of lowercase strings
 
-### Business Logic Validation
-- Step IDs must be unique within a scenario
-- Referenced step IDs in conditions must exist
-- Rubric weights should sum to 100 across all steps
-- Bot steps must have message content
-- User steps must have expected_user_actions or rubric
+### File Structure
 
-### File References
-- All attachment filenames must exist in the scenario directory
-- PDF files must be under 10MB
-- Markdown files must be valid CommonMark
-- Image files must be PNG, JPG, or SVG format
+```
+content/
+├── claim_handling_v1/
+│   ├── scenario.yaml
+│   ├── claim_handling_guide.pdf
+│   └── empathy_examples.md
+└── customer_service_v1/
+    ├── scenario.yaml
+    ├── customer_service_manual.pdf
+    └── troubleshooting_steps.md
+```
 
-## Schema Evolution
+## Validation Implementation
 
-### Version Compatibility
-- Minor version changes (1.0.x): Backward compatible
-- Major version changes (2.x.x): May require migration
-- Schema versioning separate from scenario versioning
+### Python Validation
 
-### Deprecated Fields
-Fields marked as deprecated will be supported for 2 major versions before removal.
+```python
+import yaml
+from typing import Dict, List, Optional
+from pydantic import BaseModel, validator
 
-### Extension Points
-- `metadata` field allows custom properties
-- `conditions` system supports custom condition types
-- `rubric.custom_evaluation` allows scenario-specific evaluation logic
+class BotMessage(BaseModel):
+    content: str
+    expected_keywords: List[str]
+
+class LLMConfig(BaseModel):
+    model: str
+    temperature: float
+    max_tokens: int
+    
+    @validator('temperature')
+    def temperature_range(cls, v):
+        if not 0.0 <= v <= 1.0:
+            raise ValueError('temperature must be between 0.0 and 1.0')
+        return v
+
+class Document(BaseModel):
+    filename: str
+    title: Optional[str] = None
+
+class Completion(BaseModel):
+    min_exchanges: Optional[int] = 1
+    required_keywords: Optional[List[str]] = []
+
+class Scenario(BaseModel):
+    id: str
+    title: str
+    description: Optional[str] = None
+    duration_minutes: int
+    bot_messages: List[BotMessage]
+    llm_config: LLMConfig
+    documents: Optional[List[Document]] = []
+    completion: Optional[Completion] = Completion()
+    
+    @validator('id')
+    def validate_id(cls, v):
+        if not v.replace('_', '').isalnum():
+            raise ValueError('id must be alphanumeric with underscores')
+        return v
+
+def validate_scenario_yaml(yaml_content: str) -> Scenario:
+    """Validate YAML content against schema"""
+    data = yaml.safe_load(yaml_content)
+    return Scenario(**data)
+```
+
+### Simple Validation Script
+
+```python
+# scripts/validate_scenarios.py
+import os
+import yaml
+from pathlib import Path
+
+def validate_all_scenarios():
+    """Validate all scenario YAML files"""
+    content_dir = Path("content")
+    errors = []
+    
+    for scenario_dir in content_dir.iterdir():
+        if scenario_dir.is_dir():
+            yaml_file = scenario_dir / "scenario.yaml"
+            if yaml_file.exists():
+                try:
+                    with open(yaml_file) as f:
+                        scenario = validate_scenario_yaml(f.read())
+                    print(f"✓ {scenario.id}: Valid")
+                except Exception as e:
+                    errors.append(f"✗ {yaml_file}: {e}")
+                    
+    if errors:
+        print("\nValidation Errors:")
+        for error in errors:
+            print(error)
+        return False
+    
+    print(f"\n✓ All {len(list(content_dir.iterdir()))} scenarios valid")
+    return True
+
+if __name__ == "__main__":
+    validate_all_scenarios()
+```
+
+## Content Creation Guidelines
+
+### 1. Keep It Simple
+- Maximum 4-5 bot messages per scenario
+- Clear, realistic conversation flow
+- Focused learning objectives
+
+### 2. Expected Keywords
+- 3-5 keywords per message
+- Mix of specific terms and general empathy words
+- Lowercase for consistency
+
+### 3. LLM Configuration
+- Use `gpt-4o-mini` for cost efficiency
+- Temperature 0.6-0.8 for natural conversation
+- Max tokens 150-200 to keep responses focused
+
+### 4. Documents
+- Maximum 2-3 documents per scenario
+- PDF for official procedures
+- Markdown for quick reference
+
+### 5. Testing
+- Test each scenario manually
+- Verify expected keywords are reasonable
+- Check document files exist and are accessible
+
+## Deployment Integration
+
+### Loading Scenarios
+
+```python
+def load_scenario(scenario_id: str) -> Scenario:
+    """Load and validate scenario from file"""
+    yaml_file = Path(f"content/{scenario_id}/scenario.yaml")
+    
+    if not yaml_file.exists():
+        raise FileNotFoundError(f"Scenario {scenario_id} not found")
+    
+    with open(yaml_file) as f:
+        return validate_scenario_yaml(f.read())
+
+def list_available_scenarios() -> List[Scenario]:
+    """List all valid scenarios"""
+    scenarios = []
+    content_dir = Path("content")
+    
+    for scenario_dir in content_dir.iterdir():
+        if scenario_dir.is_dir():
+            try:
+                scenario = load_scenario(scenario_dir.name)
+                scenarios.append(scenario)
+            except Exception as e:
+                print(f"Warning: Failed to load {scenario_dir.name}: {e}")
+    
+    return scenarios
+```
+
+## Migration from Complex Schema
+
+### What Was Removed
+- ❌ SMART goals structure
+- ❌ Complex persona definitions
+- ❌ Advanced rubric system
+- ❌ Conditional logic and branching
+- ❌ A/B testing variants
+- ❌ Sophisticated evaluation criteria
+- ❌ Metadata and versioning
+
+### What Was Kept
+- ✅ Basic scenario identification
+- ✅ Simple conversation flow
+- ✅ LLM configuration
+- ✅ Document references
+- ✅ Keyword-based evaluation
 
 ---
 
-This YAML schema provides the complete specification for defining ChatTrain training scenarios with full validation and TDD support.
+This simplified YAML schema reduces complexity by ~80% while maintaining essential functionality for MVP1 pilot testing. Content creators can focus on conversation quality rather than complex schema compliance.

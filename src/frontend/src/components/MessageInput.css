@@ -1,0 +1,51 @@
+/* Styles for MessageInput component */
+.message-input {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
+}
+
+.message-input textarea {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.message-input textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.message-input textarea:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.message-input button {
+  padding: 0.75rem 2rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-end;
+}
+
+.message-input button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.message-input button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

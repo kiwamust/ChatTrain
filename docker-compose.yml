@@ -1,0 +1,85 @@
+# docker-compose.yml - ChatTrain MVP1 Development Environment
+version: '3.8'
+
+services:
+  # Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_PATH=/app/data/chattrain.db
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - MAX_TOKENS=${MAX_TOKENS:-200}
+      - TEMPERATURE=${TEMPERATURE:-0.7}
+      - RATE_LIMIT_REQUESTS_PER_MINUTE=${RATE_LIMIT_REQUESTS_PER_MINUTE:-20}
+      - MAX_MESSAGE_LENGTH=${MAX_MESSAGE_LENGTH:-2000}
+    volumes:
+      - ./src/backend:/app
+      - ./content:/app/content
+      - chattrain_data:/app/data
+    depends_on:
+      - database
+    restart: unless-stopped
+    networks:
+      - chattrain-network
+
+  # Frontend Service (Development)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - chattrain-network
+
+  # Database Service (PostgreSQL with pgvector)
+  database:
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-chattrain}
+      - POSTGRES_USER=${POSTGRES_USER:-chattrain}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-chattrain123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    restart: unless-stopped
+    networks:
+      - chattrain-network
+
+  # Redis Service (for rate limiting and caching)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - chattrain-network
+
+volumes:
+  chattrain_data:
+  postgres_data:
+  redis_data:
+
+networks:
+  chattrain-network:
+    driver: bridge

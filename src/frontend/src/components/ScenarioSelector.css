@@ -1,0 +1,86 @@
+/* Styles for ScenarioSelector component */
+.scenario-selector {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f5f5f5;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.scenario-card {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.scenario-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border-color: #4CAF50;
+}
+
+.scenario-card:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.scenario-card h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.scenario-card p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.documents-info {
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.document-count {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.loading, .error {
+  font-size: 1.2rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.error {
+  color: #d32f2f;
+}

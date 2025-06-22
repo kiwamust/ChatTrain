@@ -1,314 +1,84 @@
-# ChatTrain MVP1 API Specification
+# ChatTrain MVP1 API Specification (Simplified)
 
 ## Overview
 
-This document defines the REST API and WebSocket interfaces for ChatTrain MVP1. All endpoints use JSON for request/response bodies unless otherwise specified.
+This document defines the **minimal API interface** for ChatTrain MVP1, consisting of 4 essential endpoints and 1 WebSocket connection to support 5 pilot users completing training scenarios.
 
 ## Base Configuration
 
 - **Base URL**: `http://localhost:8000/api`
 - **WebSocket URL**: `ws://localhost:8000`
+- **Authentication**: Simple user_id parameter (no complex auth)
 - **API Version**: v1
-- **Authentication**: None (MVP1)
 
 ## REST API Endpoints
 
-### 1. Health Check
+### 1. GET /api/scenarios
 
-#### GET /health
-Returns the health status of the API.
-
-**Response**
-```json
-{
-  "status": "healthy",
-  "version": "1.0.0",
-  "timestamp": "2025-06-22T10:30:00Z",
-  "services": {
-    "database": "healthy",
-    "vector_db": "healthy",
-    "llm": "healthy"
-  }
-}
-```
-
-### 2. Scenarios
-
-#### GET /scenarios
 List all available training scenarios.
-
-**Query Parameters**
-- `domain` (optional): Filter by domain (e.g., "onboarding", "sales")
-- `version` (optional): Specific version (default: latest)
 
 **Response**
 ```json
 {
   "scenarios": [
     {
-      "id": "onboarding.claim_handling.v1",
-      "title": "Insurance Claim Handling Basics",
-      "description": "Learn to handle customer insurance claims",
-      "domain": "onboarding",
-      "version": "1.0.0",
+      "id": "claim_handling_v1",
+      "title": "Insurance Claim Handling",
+      "description": "Basic claim processing training",
       "duration_minutes": 30,
-      "difficulty": "beginner",
-      "tags": ["insurance", "customer-service"],
-      "smart_goals": [
-        {
-          "S": "Handle insurance claim inquiry",
-          "M": "Successfully gather required information",
-          "A": "Using company guidelines",
-          "R": "To ensure customer satisfaction",
-          "T": "Within 30-minute session"
-        }
-      ]
-    }
-  ],
-  "total": 1
-}
-```
-
-#### GET /scenarios/{scenario_id}
-Get detailed information about a specific scenario.
-
-**Path Parameters**
-- `scenario_id`: Scenario identifier (e.g., "onboarding.claim_handling.v1")
-
-**Response**
-```json
-{
-  "id": "onboarding.claim_handling.v1",
-  "title": "Insurance Claim Handling Basics",
-  "description": "Learn to handle customer insurance claims",
-  "domain": "onboarding",
-  "version": "1.0.0",
-  "duration_minutes": 30,
-  "difficulty": "beginner",
-  "tags": ["insurance", "customer-service"],
-  "smart_goals": [
-    {
-      "S": "Handle insurance claim inquiry",
-      "M": "Successfully gather required information", 
-      "A": "Using company guidelines",
-      "R": "To ensure customer satisfaction",
-      "T": "Within 30-minute session"
-    }
-  ],
-  "llm_profile": {
-    "model": "gpt-4o",
-    "temperature": 0.7,
-    "system_prompt": "You are a customer who needs help with an insurance claim...",
-    "persona": {
-      "name": "Sarah Johnson",
-      "background": "Recent car accident victim",
-      "emotional_state": "concerned",
-      "knowledge_level": "novice"
-    }
-  },
-  "attachments": [
-    {
-      "filename": "claim_handling_guide.pdf",
-      "type": "pdf",
-      "description": "Official claim handling procedures"
+      "documents": ["guide.pdf", "examples.md"]
     },
     {
-      "filename": "faq.md", 
-      "type": "markdown",
-      "description": "Frequently asked questions"
+      "id": "customer_service_v1", 
+      "title": "Customer Service Basics",
+      "description": "Customer interaction training",
+      "duration_minutes": 30,
+      "documents": ["manual.pdf", "scripts.md"]
     }
-  ],
-  "steps": [
-    {
-      "id": "step_1",
-      "role": "bot",
-      "message": "Hi, I was in a car accident yesterday and need to file a claim. Can you help me?",
-      "expected_user_actions": ["gather_basic_info", "show_empathy"],
-      "rubric": {
-        "must_include": ["policy number", "accident date", "contact information"],
-        "nice_to_have": ["empathetic response", "clear next steps"]
-      }
-    }
-  ],
-  "completion_conditions": {
-    "type": "all_steps_completed",
-    "minimum_score": 70
-  }
+  ]
 }
 ```
 
-### 3. Sessions
+### 2. POST /api/sessions
 
-#### POST /sessions
 Create a new training session.
 
 **Request Body**
 ```json
 {
-  "scenario_id": "onboarding.claim_handling.v1",
-  "user_id": "user123",
-  "variant": "A"
+  "scenario_id": "claim_handling_v1",
+  "user_id": "pilot_user_1"
 }
 ```
 
 **Response**
 ```json
 {
-  "session_id": "550e8400-e29b-41d4-a716-446655440000",
-  "scenario_id": "onboarding.claim_handling.v1",
-  "user_id": "user123",
+  "session_id": "sess_abc123",
+  "scenario_id": "claim_handling_v1",
+  "user_id": "pilot_user_1",
   "status": "created",
-  "websocket_url": "ws://localhost:8000/chat/stream?session_id=550e8400-e29b-41d4-a716-446655440000",
-  "created_at": "2025-06-22T10:30:00Z"
+  "websocket_url": "ws://localhost:8000/chat/sess_abc123"
 }
 ```
 
-#### GET /sessions/{session_id}
-Get session details and current status.
+### 3. GET /api/documents/{scenario_id}/{filename}
 
-**Path Parameters**
-- `session_id`: Session UUID
+Serve scenario documents (PDF, Markdown files).
+
+**Example**: `GET /api/documents/claim_handling_v1/guide.pdf`
+
+**Response**: File content with appropriate Content-Type headers
+
+### 4. GET /api/health
+
+Simple health check for the service.
 
 **Response**
 ```json
 {
-  "session_id": "550e8400-e29b-41d4-a716-446655440000",
-  "scenario_id": "onboarding.claim_handling.v1",
-  "user_id": "user123",
-  "status": "in_progress",
-  "current_step": 3,
-  "total_steps": 8,
-  "started_at": "2025-06-22T10:30:00Z",
-  "last_activity": "2025-06-22T10:45:00Z",
-  "messages_count": 12
-}
-```
-
-#### PUT /sessions/{session_id}/status
-Update session status.
-
-**Request Body**
-```json
-{
-  "status": "completed",
-  "completion_reason": "all_steps_finished"
-}
-```
-
-**Response**
-```json
-{
-  "session_id": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "completed",
-  "completed_at": "2025-06-22T11:00:00Z"
-}
-```
-
-### 4. Export
-
-#### GET /sessions/{session_id}/export
-Export session data in various formats.
-
-**Query Parameters**
-- `format`: Export format ("json", "pdf", "markdown")
-- `include_feedback`: Include evaluation feedback (default: true)
-
-**Response (JSON format)**
-```json
-{
-  "session": {
-    "session_id": "550e8400-e29b-41d4-a716-446655440000",
-    "scenario_id": "onboarding.claim_handling.v1",
-    "user_id": "user123",
-    "started_at": "2025-06-22T10:30:00Z",
-    "completed_at": "2025-06-22T11:00:00Z",
-    "duration_minutes": 30
-  },
-  "messages": [
-    {
-      "id": "msg_001",
-      "role": "assistant",
-      "content": "Hi, I was in a car accident yesterday...",
-      "timestamp": "2025-06-22T10:30:15Z"
-    },
-    {
-      "id": "msg_002", 
-      "role": "user",
-      "content": "I'm sorry to hear about your accident. Can you provide your policy number?",
-      "timestamp": "2025-06-22T10:31:00Z"
-    }
-  ],
-  "feedback": [
-    {
-      "step_id": "step_1",
-      "type": "rule_based",
-      "score": {
-        "must_include_met": 3,
-        "must_include_total": 3,
-        "nice_to_have_met": 2,
-        "nice_to_have_total": 2
-      },
-      "comments": "Excellent response showing empathy and gathering required information.",
-      "suggestions": []
-    }
-  ],
-  "summary": {
-    "overall_score": 85,
-    "strengths": ["Empathetic communication", "Thorough information gathering"],
-    "areas_for_improvement": ["Could provide clearer next steps"]
-  }
-}
-```
-
-**Response (PDF format)**
-- Content-Type: `application/pdf`
-- Content-Disposition: `attachment; filename="session_report.pdf"`
-
-### 5. Feedback
-
-#### GET /sessions/{session_id}/feedback
-Get evaluation feedback for a session.
-
-**Response**
-```json
-{
-  "session_id": "550e8400-e29b-41d4-a716-446655440000",
-  "feedback": [
-    {
-      "step_id": "step_1",
-      "timestamp": "2025-06-22T10:35:00Z",
-      "evaluation_type": "rule_based",
-      "criteria": {
-        "must_include": {
-          "policy_number": true,
-          "accident_date": true,
-          "contact_info": false
-        },
-        "nice_to_have": {
-          "empathy": true,
-          "clear_next_steps": true
-        }
-      },
-      "score": 80,
-      "comments": "Good start, but please remember to collect contact information.",
-      "suggestions": [
-        "Ask for customer's preferred contact method",
-        "Confirm contact details before proceeding"
-      ]
-    }
-  ],
-  "overall_evaluation": {
-    "total_score": 85,
-    "grade": "B+",
-    "strengths": [
-      "Excellent empathy and customer rapport",
-      "Systematic information gathering"
-    ],
-    "improvements": [
-      "Be more thorough with contact information collection",
-      "Provide clearer explanation of next steps"
-    ]
-  }
+  "status": "healthy",
+  "timestamp": "2025-06-22T10:30:00Z"
 }
 ```
 
@@ -316,145 +86,142 @@ Get evaluation feedback for a session.
 
 ### Connection
 
-#### WS /chat/stream
-Establish real-time chat connection.
+#### WS /chat/{session_id}
 
-**Query Parameters**
-- `session_id`: Session UUID (required)
+Establish real-time chat connection for a specific session.
 
-**Connection Flow**
-1. Client connects with session_id
-2. Server validates session and sends session_initialized
-3. Client/Server exchange messages
-4. Server sends session_completed when done
+**Example**: `ws://localhost:8000/chat/sess_abc123`
 
 ### Message Types
 
-#### 1. Session Initialization
+#### 1. Session Start (Server → Client)
 
-**Server → Client**
+Sent immediately after WebSocket connection is established.
+
 ```json
 {
-  "type": "session_initialized",
-  "session_id": "550e8400-e29b-41d4-a716-446655440000",
+  "type": "session_start",
+  "session_id": "sess_abc123",
   "scenario": {
     "title": "Insurance Claim Handling",
-    "description": "Learn to handle customer claims",
-    "attachments": [
-      {
-        "filename": "guide.pdf",
-        "url": "/api/attachments/guide.pdf"
-      }
-    ]
+    "documents": ["guide.pdf", "examples.md"]
   },
-  "first_message": {
-    "role": "assistant", 
-    "content": "Hi, I was in a car accident yesterday and need to file a claim. Can you help me?"
-  }
+  "first_message": "Hi, I was in a car accident and need to file a claim. Can you help me?"
 }
 ```
 
-#### 2. User Message
+#### 2. User Message (Client → Server)
 
-**Client → Server**
+User sends a message during the conversation.
+
 ```json
 {
-  "type": "user_message",
-  "content": "I'm sorry to hear about your accident. Let me help you with that. Can you provide your policy number?",
-  "timestamp": "2025-06-22T10:31:00Z"
+  "type": "user_message", 
+  "content": "I'm sorry to hear about your accident. Can you provide your policy number?"
 }
 ```
 
-#### 3. Assistant Message
+#### 3. Assistant Response (Server → Client)
 
-**Server → Client**
+LLM-generated response from the system.
+
 ```json
 {
   "type": "assistant_message",
-  "content": "Yes, my policy number is AC123456. The accident happened yesterday around 3 PM on Highway 101.",
-  "timestamp": "2025-06-22T10:31:30Z",
-  "metadata": {
-    "step_id": "step_1",
-    "typing_duration": 3000
+  "content": "Yes, my policy number is AC-123456. The accident happened yesterday around 3 PM.",
+  "feedback": {
+    "score": 85,
+    "comment": "Good empathy! You gathered the policy number successfully. Next, ask about the incident details.",
+    "found_keywords": ["policy", "help"]
   }
 }
 ```
 
-#### 4. Typing Indicator
+#### 4. Session Complete (Server → Client)
 
-**Server → Client**
+Sent when the training scenario is completed.
+
 ```json
 {
-  "type": "typing_indicator",
-  "is_typing": true,
-  "estimated_duration": 3000
+  "type": "session_complete",
+  "session_id": "sess_abc123",
+  "summary": {
+    "total_exchanges": 6,
+    "average_score": 82,
+    "completion_time_minutes": 28,
+    "overall_feedback": "Strong performance! You showed good empathy and gathered required information effectively."
+  }
 }
 ```
 
-#### 5. Step Feedback
+#### 5. Error (Server → Client)
 
-**Server → Client**
-```json
-{
-  "type": "step_feedback", 
-  "step_id": "step_1",
-  "evaluation": {
-    "score": 85,
-    "feedback": "Great empathetic response! You successfully gathered the policy number.",
-    "suggestions": [
-      "Don't forget to ask for contact information",
-      "Consider asking about injuries or property damage"
-    ]
-  },
-  "next_step_preview": "Continue gathering details about the accident..."
-}
-```
+Error handling for any issues during the session.
 
-#### 6. Session Completion
-
-**Server → Client**
-```json
-{
-  "type": "session_completed",
-  "session_id": "550e8400-e29b-41d4-a716-446655440000",
-  "completion_reason": "all_steps_finished",
-  "final_evaluation": {
-    "overall_score": 85,
-    "grade": "B+",
-    "summary": "Strong performance with room for improvement in information gathering."
-  },
-  "export_url": "/api/sessions/550e8400-e29b-41d4-a716-446655440000/export"
-}
-```
-
-#### 7. Error Handling
-
-**Server → Client**
 ```json
 {
   "type": "error",
-  "code": "INVALID_SESSION",
-  "message": "Session not found or expired",
-  "details": {
-    "session_id": "invalid-session-id"
+  "message": "OpenAI API temporarily unavailable. Please try again.",
+  "code": "LLM_SERVICE_ERROR"
+}
+```
+
+## Data Models
+
+### Session
+
+```json
+{
+  "id": "string",
+  "scenario_id": "string", 
+  "user_id": "string",
+  "status": "created" | "active" | "completed",
+  "created_at": "2025-06-22T10:30:00Z",
+  "messages": ["array of message objects"]
+}
+```
+
+### Message
+
+```json
+{
+  "id": "string",
+  "session_id": "string",
+  "role": "user" | "assistant" | "system",
+  "content": "string",
+  "timestamp": "2025-06-22T10:30:00Z"
+}
+```
+
+### Scenario
+
+```json
+{
+  "id": "string",
+  "title": "string",
+  "description": "string",
+  "duration_minutes": "number",
+  "bot_messages": ["array of bot message configs"],
+  "documents": ["array of document filenames"],
+  "llm_config": {
+    "model": "gpt-4o-mini",
+    "temperature": 0.7,
+    "max_tokens": 200
   }
 }
 ```
 
-## Error Responses
+## Error Handling
 
 ### Standard Error Format
+
 ```json
 {
   "error": {
     "code": "ERROR_CODE",
-    "message": "Human readable error message",
-    "details": {
-      "field": "Additional context"
-    }
+    "message": "Human readable error message"
   },
-  "timestamp": "2025-06-22T10:30:00Z",
-  "request_id": "req_12345"
+  "timestamp": "2025-06-22T10:30:00Z"
 }
 ```
 
@@ -462,33 +229,115 @@ Establish real-time chat connection.
 
 | Code | HTTP Status | Description |
 |------|-------------|-------------|
-| INVALID_SESSION | 404 | Session not found |
 | SCENARIO_NOT_FOUND | 404 | Scenario does not exist |
-| VALIDATION_ERROR | 400 | Request validation failed |
-| RATE_LIMIT_EXCEEDED | 429 | Too many requests |
-| LLM_SERVICE_ERROR | 503 | External LLM service unavailable |
-| DATABASE_ERROR | 500 | Database connection error |
+| SESSION_NOT_FOUND | 404 | Session not found |
+| INVALID_REQUEST | 400 | Request validation failed |
+| LLM_SERVICE_ERROR | 503 | OpenAI API unavailable |
+| RATE_LIMIT_EXCEEDED | 429 | Too many requests (20/min limit) |
 
-## Rate Limiting
+## Simple Rate Limiting
 
-- **REST API**: 100 requests per minute per IP
+- **REST API**: 20 requests per minute per user_id
 - **WebSocket**: 1 connection per session
-- **LLM calls**: 10 requests per minute per session
+- **OpenAI calls**: Built-in OpenAI rate limiting
 
-## Data Validation
+## Implementation Notes
 
-### Request Validation
-- All requests validated using Pydantic models
-- Required fields enforced
-- Data types and formats validated
-- Maximum lengths enforced
+### Backend Implementation
 
-### Response Validation  
-- All responses follow defined schemas
-- Consistent error format
-- Proper HTTP status codes
-- CORS headers included
+```python
+from fastapi import FastAPI, WebSocket
+from fastapi.staticfiles import StaticFiles
+import sqlite3
+import openai
+
+app = FastAPI()
+
+# Serve documents
+app.mount("/api/documents", StaticFiles(directory="content"), name="documents")
+
+@app.get("/api/scenarios")
+async def list_scenarios():
+    # Load from content/ directory
+    pass
+
+@app.post("/api/sessions")  
+async def create_session(scenario_id: str, user_id: str):
+    # Create session in SQLite
+    pass
+
+@app.websocket("/chat/{session_id}")
+async def chat_endpoint(websocket: WebSocket, session_id: str):
+    # Handle real-time chat
+    pass
+
+@app.get("/api/health")
+async def health():
+    return {"status": "healthy"}
+```
+
+### Frontend Implementation
+
+```typescript
+// Simple API client
+class ChatTrainAPI {
+  async getScenarios() {
+    return fetch('/api/scenarios').then(r => r.json());
+  }
+  
+  async createSession(scenarioId: string, userId: string) {
+    return fetch('/api/sessions', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({scenario_id: scenarioId, user_id: userId})
+    }).then(r => r.json());
+  }
+  
+  connectWebSocket(sessionId: string) {
+    return new WebSocket(`ws://localhost:8000/chat/${sessionId}`);
+  }
+}
+```
+
+## Testing
+
+### API Testing
+
+```python
+def test_scenarios_endpoint():
+    response = client.get("/api/scenarios")
+    assert response.status_code == 200
+    assert "scenarios" in response.json()
+
+def test_session_creation():
+    response = client.post("/api/sessions", json={
+        "scenario_id": "claim_handling_v1",
+        "user_id": "test_user"
+    })
+    assert response.status_code == 200
+    assert "session_id" in response.json()
+```
+
+### WebSocket Testing
+
+```python
+def test_chat_flow():
+    with client.websocket_connect("/chat/test_session") as websocket:
+        # Test session start
+        data = websocket.receive_json()
+        assert data["type"] == "session_start"
+        
+        # Test user message
+        websocket.send_json({
+            "type": "user_message",
+            "content": "Hello, I need help"
+        })
+        
+        # Test assistant response
+        response = websocket.receive_json()
+        assert response["type"] == "assistant_message"
+```
 
 ---
 
-This API specification provides the complete interface definition for TDD implementation of ChatTrain MVP1.
+This simplified API specification reduces complexity by ~70% while maintaining all essential functionality for MVP1 pilot testing with 5 users and 2 scenarios.

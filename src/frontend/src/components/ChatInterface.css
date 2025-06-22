@@ -1,0 +1,106 @@
+/* Styles for ChatInterface component */
+.chat-interface {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.session-info {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.session-info h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.connection-status {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.end-session-btn {
+  padding: 0.5rem 1.5rem;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.end-session-btn:hover {
+  background-color: #d32f2f;
+}
+
+.chat-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.chat-pane {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e0e0e0;
+}
+
+.document-pane {
+  flex: 0 0 40%;
+  overflow: hidden;
+}
+
+.error-notification {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f44336;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 1024px) {
+  .chat-pane {
+    flex: 0 0 55%;
+  }
+  
+  .document-pane {
+    flex: 0 0 45%;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-body {
+    flex-direction: column;
+  }
+  
+  .chat-pane {
+    flex: 1 1 60%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .document-pane {
+    flex: 1 1 40%;
+  }
+}

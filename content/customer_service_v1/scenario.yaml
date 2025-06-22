@@ -1,0 +1,32 @@
+id: "customer_service_v1"
+title: "Customer Service Support Training"
+description: "Practice handling customer inquiries and technical issues with professionalism. Learn to troubleshoot problems, provide clear solutions, and ensure customer satisfaction."
+duration_minutes: 30
+
+bot_messages:
+  - content: "Hello, I'm having trouble with my account. I can't log in to your website and I've been trying for over an hour. This is really frustrating because I need to check my order status."
+    expected_keywords: ["help", "assistance", "sorry", "troubleshoot", "understand", "username"]
+    
+  - content: "My username is john.smith and I keep getting an error message that says 'Invalid credentials'. I'm sure I'm using the right password because I wrote it down. I changed it about two weeks ago."
+    expected_keywords: ["reset", "password", "verify", "email", "security", "recent"]
+    
+  - content: "I think I might have changed my password recently, but I honestly can't remember exactly what I changed it to. I've tried a few different combinations but nothing works. Is there a way to reset it?"
+    expected_keywords: ["reset", "email", "link", "temporary", "steps", "process"]
+    
+  - content: "Yes, that email address is correct - john.smith@email.com. How long does it usually take to receive the reset email? And what if I don't see it in my inbox?"
+    expected_keywords: ["minutes", "spam", "junk", "check", "wait", "support", "alternative"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 180
+
+documents:
+  - filename: "service_manual.pdf"
+    title: "Customer Service Guidelines & Procedures"
+  - filename: "troubleshooting_steps.md"
+    title: "Account & Login Troubleshooting Guide"
+
+completion:
+  min_exchanges: 4
+  required_keywords: ["password", "reset", "help", "email"]
