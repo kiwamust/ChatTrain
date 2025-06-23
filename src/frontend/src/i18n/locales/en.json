@@ -1,0 +1,160 @@
+{
+  "scenarioSelector": {
+    "loading": "Loading scenarios...",
+    "error": "Failed to load scenarios",
+    "title": "ChatTrain - Select Training Scenario",
+    "subtitle": "Choose a training scenario to begin your session",
+    "documentCount_one": "{{count}} reference document",
+    "documentCount_other": "{{count}} reference documents"
+  },
+  "chatInterface": {
+    "welcomeMessage": "Welcome to {{scenarioTitle}}. You are now connected with a customer. Remember to be professional and helpful!",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "endSession": "End Session",
+    "endSessionConfirm": "Are you sure you want to end this training session?",
+    "connectionError": "Connection error:"
+  },
+  "messageInput": {
+    "placeholder": "Type your response to the customer...",
+    "send": "Send",
+    "messageInputLabel": "Message input",
+    "sendMessageLabel": "Send message"
+  },
+  "messageList": {
+    "emptyState": "Start the conversation by sending a message to the customer.",
+    "you": "You",
+    "customer": "Customer",
+    "system": "System",
+    "score": "Score:",
+    "keywordsDetected": "Keywords detected:"
+  },
+  "documentViewer": {
+    "referenceDocuments": "Reference Documents",
+    "mockContent": "Mock content for {{filename}}. This would show the actual document content in the real implementation.",
+    "documents": {
+      "service_guide": {
+        "title": "Customer Service Guide",
+        "greeting": {
+          "title": "1. Greeting Customers",
+          "description": "Always begin with a warm, professional greeting:",
+          "examples": [
+            "Good morning/afternoon, thank you for contacting us.",
+            "How may I assist you today?"
+          ]
+        },
+        "listening": {
+          "title": "2. Active Listening",
+          "description": "Key techniques:",
+          "techniques": [
+            "Let the customer finish speaking",
+            "Ask clarifying questions",
+            "Summarize their concerns"
+          ]
+        },
+        "resolution": {
+          "title": "3. Problem Resolution",
+          "description": "Follow the STAR method:",
+          "star": {
+            "situation": "Situation - Understand the issue",
+            "task": "Task - Identify what needs to be done",
+            "action": "Action - Take appropriate steps",
+            "result": "Result - Ensure customer satisfaction"
+          }
+        }
+      },
+      "scripts": {
+        "title": "Common Response Scripts",
+        "complaints": {
+          "title": "Handling Complaints",
+          "template": "I understand your frustration, and I sincerely apologize for the inconvenience. Let me look into this right away and find a solution for you."
+        },
+        "technical": {
+          "title": "Technical Issues",
+          "template": "I'd be happy to help you resolve this technical issue. Can you please provide me with [specific information needed]?"
+        },
+        "billing": {
+          "title": "Billing Inquiries",
+          "template": "I'll review your account details to clarify this billing matter. May I have your account number or email address associated with the account?"
+        }
+      },
+      "tech_manual": {
+        "title": "Technical Support Manual",
+        "commonIssues": "Common Issues and Solutions",
+        "login": {
+          "title": "Login Problems",
+          "steps": [
+            "Verify username/email is correct",
+            "Check CAPS LOCK key",
+            "Reset password if needed",
+            "Clear browser cache and cookies"
+          ]
+        },
+        "performance": {
+          "title": "Performance Issues",
+          "steps": [
+            "Check internet connection speed",
+            "Update to latest software version",
+            "Restart device",
+            "Check system requirements"
+          ]
+        }
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting Guide",
+        "procedures": "Step-by-Step Procedures",
+        "errorCodes": {
+          "title": "Error Code Reference",
+          "401": "Authentication failed - Reset credentials",
+          "404": "Resource not found - Verify URL/path",
+          "500": "Server issue - Wait and retry"
+        },
+        "diagnosticQuestions": {
+          "title": "Diagnostic Questions",
+          "questions": [
+            "When did the issue first occur?",
+            "What were you trying to do?",
+            "Have you made any recent changes?",
+            "Can you reproduce the issue?"
+          ]
+        }
+      },
+      "sales_guide": {
+        "title": "Sales Training Guide",
+        "rapport": {
+          "title": "Building Rapport",
+          "techniques": [
+            "Use the customer's name",
+            "Mirror their communication style",
+            "Show genuine interest in their needs"
+          ]
+        },
+        "needs": {
+          "title": "Identifying Needs",
+          "description": "Ask open-ended questions:",
+          "questions": [
+            "What challenges are you facing?",
+            "What would an ideal solution look like?",
+            "How would this help your business?"
+          ]
+        }
+      },
+      "objection_handling": {
+        "title": "Handling Sales Objections",
+        "subtitle": "Common Objections & Responses",
+        "expensive": {
+          "objection": "It's too expensive",
+          "response": "I understand price is important. Let's look at the value and ROI this brings to your business..."
+        },
+        "think": {
+          "objection": "I need to think about it",
+          "response": "Of course! What specific aspects would you like to consider? I can provide additional information to help with your decision."
+        },
+        "current": {
+          "objection": "We're happy with our current solution",
+          "response": "That's great to hear! Many of our customers felt the same way before seeing how we could enhance their current setup..."
+        }
+      }
+    }
+  }
+}

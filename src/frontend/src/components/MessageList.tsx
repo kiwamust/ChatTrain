@@ -1,5 +1,6 @@
 // Message list component for displaying chat messages
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Message } from '../types';
 import './MessageList.css';
 
@@ -8,6 +9,7 @@ interface MessageListProps {
 }
 
 export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
+  const { t, i18n } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   }, [messages]);
 
   const formatTime = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(i18n.language, {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
@@ -27,7 +29,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
     <div className="message-list">
       {messages.length === 0 && (
         <div className="empty-state">
-          Start the conversation by sending a message to the customer.
+          {t('messageList.emptyState')}
         </div>
       )}
       
@@ -36,12 +38,12 @@ export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           key={message.id}
           className={`message ${message.type}`}
           role="article"
-          aria-label={`${message.type === 'user_message' ? 'You' : 'Customer'}: ${message.content}`}
+          aria-label={`${message.type === 'user_message' ? t('messageList.you') : t('messageList.customer')}: ${message.content}`}
         >
           <div className="message-header">
             <span className="message-sender">
-              {message.type === 'user_message' ? 'You' : 
-               message.type === 'assistant_message' ? 'Customer' : 'System'}
+              {message.type === 'user_message' ? t('messageList.you') : 
+               message.type === 'assistant_message' ? t('messageList.customer') : t('messageList.system')}
             </span>
             <span className="message-time">{formatTime(message.timestamp)}</span>
           </div>
@@ -51,14 +53,14 @@ export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           {message.feedback && (
             <div className="message-feedback">
               <div className="feedback-score">
-                Score: <span className={`score ${message.feedback.score >= 80 ? 'high' : 'medium'}`}>
+                {t('messageList.score')} <span className={`score ${message.feedback.score >= 80 ? 'high' : 'medium'}`}>
                   {message.feedback.score}%
                 </span>
               </div>
               <div className="feedback-comment">{message.feedback.comment}</div>
               {message.feedback.found_keywords && message.feedback.found_keywords.length > 0 && (
                 <div className="feedback-keywords">
-                  Keywords detected: {message.feedback.found_keywords.join(', ')}
+                  {t('messageList.keywordsDetected')} {message.feedback.found_keywords.join(', ')}
                 </div>
               )}
             </div>
