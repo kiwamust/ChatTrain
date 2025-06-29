@@ -1,0 +1,35 @@
+id: "project_communication_v1"
+title: "Project Status & Stakeholder Communication"
+description: "Master the art of project status communication with diverse stakeholders. Practice delivering updates, managing expectations, addressing concerns, and maintaining stakeholder confidence throughout project lifecycles."
+duration_minutes: 30
+
+bot_messages:
+  - content: "Good morning, thanks for joining our monthly steering committee meeting. I'm the VP of Operations, and we've got the CFO and IT Director on the call as well. We're three months into the six-month project, and honestly, we're starting to get nervous. Can you give us a realistic update on where things stand?"
+    expected_keywords: ["status", "progress", "milestones", "on-track", "transparent", "update"]
+    
+  - content: "That's helpful context, but I need to understand the budget situation. We approved $200,000 for this project, and I'm hearing we might need additional funds. The CFO is asking hard questions about scope creep. Can you break down exactly where we stand financially and what's driving any cost increases?"
+    expected_keywords: ["budget", "costs", "scope", "change", "control", "justify"]
+    
+  - content: "I appreciate the detailed breakdown, but I'm concerned about the timeline. Our busy season starts in four months, and we absolutely cannot have any system disruptions during that period. If there are delays, we need to know now so we can plan accordingly. What's your realistic assessment of the timeline?"
+    expected_keywords: ["timeline", "risk", "mitigation", "critical", "plan", "alternatives"]
+    
+  - content: "The timeline discussion is important, but I also need to address team concerns. Some of our staff are getting anxious about the changes, and there are rumors that jobs might be eliminated. Others are complaining that they haven't heard enough about what's coming. How do we better communicate with our employees about this project?"
+    expected_keywords: ["communication", "team", "concerns", "change management", "transparency", "engagement"]
+    
+  - content: "All of this sounds reasonable, but I need to be able to report back to the CEO with confidence. She's going to ask me three questions: Are we going to deliver on time? Are we going to stay within budget? And are we going to achieve the benefits we promised? What can I tell her with certainty?"
+    expected_keywords: ["confidence", "commitment", "deliverables", "benefits", "success", "assurance"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 240
+
+documents:
+  - filename: "stakeholder_communication_guide.md"
+    title: "Executive Stakeholder Communication Best Practices"
+  - filename: "project_reporting_templates.md"
+    title: "Project Status Reporting Templates & Frameworks"
+
+completion:
+  min_exchanges: 5
+  required_keywords: ["status", "timeline", "budget", "communication", "confidence"]

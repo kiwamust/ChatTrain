@@ -1,0 +1,35 @@
+id: "technical_presentation_v1"
+title: "Technical Solution Presentation"
+description: "Learn to present technical solutions to non-technical stakeholders effectively. Practice translating complex technical concepts into business language, addressing concerns, and building confidence in your recommendations."
+duration_minutes: 30
+
+bot_messages:
+  - content: "Good morning everyone. I'm here as the CTO, along with our Operations Manager and Finance Director. We've reviewed your analysis and are eager to hear your recommendations for our new system. To be honest, we're a bit nervous about making such a big technology investment, so we need to understand exactly what you're proposing."
+    expected_keywords: ["overview", "business", "benefits", "simple", "understand", "solution"]
+    
+  - content: "Okay, so far so good. But I'm concerned about the complexity. Our current system is simple - maybe too simple - but our staff knows how to use it. How do we know this new system won't be too complicated for our team? And what happens if something goes wrong? We can't afford to have our operations shut down."
+    expected_keywords: ["user-friendly", "training", "support", "reliability", "risk", "mitigation"]
+    
+  - content: "That sounds reassuring, but I need to understand the technical side a bit better. You mentioned cloud hosting and APIs - what does that actually mean for us? And frankly, I'm worried about security. We have customer data, financial information, and business-critical processes. How do we know this will be secure?"
+    expected_keywords: ["security", "cloud", "technical", "explain", "protection", "compliance"]
+    
+  - content: "The security explanation helps, but I need to understand the costs better. You mentioned $75,000 for implementation, but what about ongoing costs? And how long will this take to implement? We have a major product launch in 8 months and can't have any disruptions during that time."
+    expected_keywords: ["cost", "timeline", "implementation", "disruption", "phases", "planning"]
+    
+  - content: "I appreciate the detailed breakdown. One final concern - what happens if you're not available during implementation? We've been burned before by consultants who start projects and then disappear. And after the system is live, what kind of ongoing support can we expect? We need to know we're not going to be left high and dry."
+    expected_keywords: ["support", "team", "ongoing", "maintenance", "partnership", "commitment"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 250
+
+documents:
+  - filename: "technical_presentation_guide.md"
+    title: "Technical Communication for Non-Technical Audiences"
+  - filename: "solution_architecture_template.md"
+    title: "Solution Architecture Presentation Template"
+
+completion:
+  min_exchanges: 5
+  required_keywords: ["solution", "benefits", "security", "timeline", "support"]

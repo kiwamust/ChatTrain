@@ -1,0 +1,35 @@
+id: "change_management_v1"
+title: "Change Management & Digital Transformation"
+description: "Practice guiding organizations through digital transformation initiatives. Learn to address resistance to change, build stakeholder buy-in, and develop comprehensive change management strategies that ensure successful adoption."
+duration_minutes: 30
+
+bot_messages:
+  - content: "Hi, I'm Janet, the HR Director here. We're implementing the new system you recommended, but I'm already hearing complaints from employees. Some are saying it's too complicated, others are worried about job security, and frankly, I think some people are just going to refuse to use it. How do we handle this kind of resistance?"
+    expected_keywords: ["understand", "concerns", "change", "communication", "resistance", "normal"]
+    
+  - content: "That makes sense, but it's not just the employees. Some of our middle managers are also pushing back. They're saying the old system works fine and questioning why we need to change at all. One department head even suggested we postpone the implementation. I'm worried this could derail the whole project."
+    expected_keywords: ["leadership", "buy-in", "benefits", "communication", "strategy", "influence"]
+    
+  - content: "I can try to get the managers on board, but what about the day-to-day users? We have people who've been doing their jobs the same way for 15 years. Yesterday, I heard someone say 'I'm too old to learn new computer systems.' How do we help people who are genuinely anxious about technology changes?"
+    expected_keywords: ["training", "support", "gradual", "confidence", "individual", "success"]
+    
+  - content: "The training approach sounds good, but I'm concerned about timing. We're in our busy season, people are already stressed, and now we're asking them to learn something new on top of their regular workload. Plus, some departments are saying they can't spare people for training sessions. How do we make this work practically?"
+    expected_keywords: ["timing", "planning", "workload", "flexible", "schedule", "phases"]
+    
+  - content: "Those are helpful suggestions. But I need to know - what happens if people still refuse to use the new system after all this effort? We can't force people to change, and I'm worried we'll have some holdouts who will undermine the whole initiative. How do we handle the people who just won't adapt?"
+    expected_keywords: ["accountability", "consequences", "support", "performance", "leadership", "follow-through"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 230
+
+documents:
+  - filename: "change_management_framework.md"
+    title: "Digital Transformation Change Management Framework"
+  - filename: "resistance_management_playbook.md"
+    title: "Overcoming Resistance to Technology Change"
+
+completion:
+  min_exchanges: 5
+  required_keywords: ["change", "resistance", "communication", "training", "leadership"]
