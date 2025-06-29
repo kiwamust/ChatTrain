@@ -1,0 +1,35 @@
+id: "problem_resolution_v1"
+title: "Problem Resolution & Client Crisis Management"
+description: "Develop skills in handling client crises and complex problem resolution. Practice analytical thinking, stakeholder communication, and solution development under pressure while maintaining client confidence and relationships."
+duration_minutes: 30
+
+bot_messages:
+  - content: "I need your help urgently. I'm the CEO of MidCorp Manufacturing, and we have a serious problem with the system you implemented six months ago. Yesterday, our entire production line went down for four hours because of system failures, and we lost $50,000 in production. Our customers are asking questions, and I'm getting pressure from the board. What are you going to do about this?"
+    expected_keywords: ["understand", "investigate", "immediate", "support", "priority", "analysis"]
+    
+  - content: "I appreciate that you want to investigate, but I need more than just analysis. Our production schedule is already behind, and we have delivery commitments to major customers that we might not be able to meet. The operations team is saying the system is unreliable and some people are suggesting we go back to the old system. How do you propose to fix this situation?"
+    expected_keywords: ["solution", "plan", "immediate", "stability", "confidence", "timeline"]
+    
+  - content: "That sounds like a reasonable approach, but I'm concerned about the time it will take. We can't afford another outage like yesterday. Meanwhile, I have to explain to customers why their orders might be delayed, and the board is questioning our entire digital transformation strategy. How do we prevent this from happening again while you're working on a permanent fix?"
+    expected_keywords: ["mitigation", "monitoring", "backup", "risk", "communication", "assurance"]
+    
+  - content: "The technical solutions you're proposing make sense, but I also need to address the people side of this crisis. My operations manager is now questioning every recommendation you've made, and the production staff are afraid to fully trust the system. Some department heads are second-guessing the entire project. How do we rebuild confidence and get everyone back on board?"
+    expected_keywords: ["confidence", "communication", "stakeholders", "trust", "change", "leadership"]
+    
+  - content: "I understand the people management aspects, but ultimately I need to know this won't happen again. The board is meeting next week, and they're going to ask me hard questions about our technology investments and whether we chose the right consulting partner. What specific commitments can you make to ensure this system performs reliably, and how will we know if it's truly fixed?"
+    expected_keywords: ["commitment", "guarantee", "monitoring", "metrics", "accountability", "partnership"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 250
+
+documents:
+  - filename: "crisis_management_framework.md"
+    title: "Client Crisis Management & Problem Resolution Framework"
+  - filename: "root_cause_analysis_guide.md"
+    title: "Systematic Root Cause Analysis for IT Systems"
+
+completion:
+  min_exchanges: 5
+  required_keywords: ["solution", "immediate", "monitoring", "confidence", "commitment"]

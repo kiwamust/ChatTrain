@@ -1,0 +1,35 @@
+id: "requirements_gathering_v1"
+title: "Requirements Gathering & Business Analysis"
+description: "Practice conducting effective requirements gathering sessions with business stakeholders. Learn to ask the right questions, identify underlying needs, and document requirements clearly for technical solutions."
+duration_minutes: 30
+
+bot_messages:
+  - content: "Hi, thanks for coming in today. I'm Sarah, the Operations Manager here. We're really struggling with our current inventory management system and heard you might be able to help us. To be honest, I'm not very technical, but I know we need something better."
+    expected_keywords: ["understand", "current", "challenges", "process", "system", "business"]
+    
+  - content: "Well, right now we're using a mix of Excel spreadsheets and a really old system from 2015. It takes our team hours every week just to update inventory levels, and we're constantly running into issues where we think we have stock but we don't, or vice versa. It's causing problems with our customers."
+    expected_keywords: ["impact", "business", "customers", "frequency", "pain points", "stakeholders"]
+    
+  - content: "It happens almost daily! Last week we had three customers complain because we promised delivery dates we couldn't meet. And my team spends about 15 hours a week just on manual data entry. They're getting frustrated because they could be doing more valuable work. The CEO is asking questions about our efficiency."
+    expected_keywords: ["quantify", "costs", "requirements", "users", "workflow", "priorities"]
+    
+  - content: "We have about 25 people who would need to use the new system - warehouse staff, sales team, and management. The warehouse folks are not very comfortable with technology, so it needs to be simple. We handle about 500 different products and process maybe 200 orders a day. Budget-wise, the CEO mentioned something about $50,000 but I'm not sure if that's realistic."
+    expected_keywords: ["integration", "timeline", "technical", "constraints", "success", "outcomes"]
+    
+  - content: "Ideally, we'd love to have this running smoothly by our busy season in 6 months. We currently use QuickBooks for accounting and Salesforce for customer management - those systems are working fine. For success, I guess we'd measure it by fewer customer complaints, less time spent on manual work, and better visibility into our actual inventory levels."
+    expected_keywords: ["next steps", "stakeholders", "documentation", "approval", "timeline", "requirements"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 220
+
+documents:
+  - filename: "requirements_gathering_guide.md"
+    title: "Business Requirements Gathering Best Practices"
+  - filename: "stakeholder_analysis_template.md"
+    title: "Stakeholder Analysis & Communication Guide"
+
+completion:
+  min_exchanges: 5
+  required_keywords: ["requirements", "business", "stakeholders", "priorities", "next steps"]
