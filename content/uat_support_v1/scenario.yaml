@@ -1,0 +1,35 @@
+id: "uat_support_v1"
+title: "UAT Client Support Training"
+description: "Practice handling client inquiries during User Acceptance Testing by consulting system specifications and providing accurate, professional responses. Learn to quickly locate relevant information and communicate technical details clearly to non-technical clients."
+duration_minutes: 35
+
+bot_messages:
+  - content: "Hi there! I'm testing the new system as part of our UAT process and I'm a bit confused about the password requirements. The system is rejecting my password even though I thought I followed the rules correctly. Can you help me understand what's going wrong?"
+    expected_keywords: ["specifications", "requirements", "check", "help", "policy", "understand"]
+    
+  - content: "I tried creating a password with 8 characters, including both uppercase and lowercase letters, but it keeps saying it's not valid. My password was 'TestPass' - that should meet the requirements, right?"
+    expected_keywords: ["numbers", "special", "characters", "minimum", "documentation", "requirements"]
+    
+  - content: "Oh I see, so I need both numbers AND special characters? The error message wasn't very clear about that. What special characters are allowed? I don't want to get locked out by trying too many invalid attempts."
+    expected_keywords: ["allowed", "symbols", "list", "attempts", "lockout", "policy", "examples"]
+    
+  - content: "Perfect, thanks! Now I have another question about the user roles. I'm supposed to test the 'Manager' role but I'm not seeing some of the menu options that are mentioned in our test scripts. Am I missing something or is this a bug?"
+    expected_keywords: ["permissions", "access", "configuration", "role", "menu", "verify", "troubleshoot"]
+    
+  - content: "I'm logged in as a Manager but I don't see the 'Reports' section that should be available according to our UAT checklist. I can see Dashboard, Users, and Settings, but no Reports tab. Should I be looking somewhere else?"
+    expected_keywords: ["specifications", "documentation", "navigation", "verify", "configuration", "expected", "behavior"]
+
+llm_config:
+  model: "gpt-4o-mini"
+  temperature: 0.6
+  max_tokens: 220
+
+documents:
+  - filename: "system_specifications.md"
+    title: "System Technical Specifications & Requirements"
+  - filename: "uat_support_guide.md"
+    title: "UAT Client Support Best Practices"
+
+completion:
+  min_exchanges: 5
+  required_keywords: ["specifications", "documentation", "verify", "help", "requirements"]
